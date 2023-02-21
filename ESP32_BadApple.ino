@@ -4,7 +4,7 @@
 #include "SSD1306.h"
 #include "heatshrink_decoder.h"
 
-// Hints: 
+// Hints:
 // * Adjust the display pins below
 // * After uploading to ESP32, also do "ESP32 Sketch Data Upload" from Arduino
 
@@ -17,7 +17,7 @@ SSD1306 display (0x3c, 4, 15); // For Heltec
 
 static heatshrink_decoder hsd;
 
-// global storage for putPixels 
+// global storage for putPixels
 int16_t curr_x = 0;
 int16_t curr_y = 0;
 
@@ -64,9 +64,9 @@ void putPixels(uint8_t c, int32_t len) {
     b = 128;
     for(int i=0; i<8; i++) {
       if(c & b) {
-        display.setColor(WHITE);  
+        display.setColor(WHITE);
       } else {
-        display.setColor(BLACK); 
+        display.setColor(BLACK);
       }
       b >>= 1;
       display.setPixel(curr_x, curr_y);
@@ -116,8 +116,8 @@ void decodeRLE(uint8_t c) {
           } else {
             putPixels(255, runlength);
           }
-          c_to_dup = -1;  
-          runlength = -1;        
+          c_to_dup = -1;
+          runlength = -1;
       }
     }
 }
@@ -127,12 +127,12 @@ void decodeRLE(uint8_t c) {
 void readFile(fs::FS &fs, const char * path){
     static uint8_t rle_buf[RLEBUFSIZE];
     size_t rle_bufhead = 0;
-    size_t rle_size = 0; 
-  
+    size_t rle_size = 0;
+
     size_t filelen = 0;
     size_t filesize;
     static uint8_t compbuf[READBUFSIZE];
-    
+
     Serial.printf("Reading file: %s\n", path);
     File file = fs.open(path);
     if(!file || file.isDirectory()){
@@ -150,8 +150,8 @@ void readFile(fs::FS &fs, const char * path){
     curr_x = 0;
     curr_y = 0;
     runlength = -1;
-    c_to_dup = -1;   
-    lastRefresh = millis(); 
+    c_to_dup = -1;
+    lastRefresh = millis();
 
     // init decoder
     heatshrink_decoder_reset(&hsd);
@@ -160,7 +160,7 @@ void readFile(fs::FS &fs, const char * path){
     size_t toRead;
     size_t toSink = 0;
     uint32_t sinkHead = 0;
-    
+
 
     // Go through file...
     while(filelen) {
@@ -177,14 +177,14 @@ void readFile(fs::FS &fs, const char * path){
       HSD_sink_res sres;
       sres = heatshrink_decoder_sink(&hsd, &compbuf[sinkHead], toSink, &count);
       //Serial.print("^^ sinked ");
-      //Serial.println(count);      
+      //Serial.println(count);
       toSink -= count;
-      sinkHead = count;        
+      sinkHead = count;
       sunk += count;
       if (sunk == filesize) {
         heatshrink_decoder_finish(&hsd);
       }
-        
+
       HSD_poll_res pres;
       do {
           rle_size = 0;
@@ -225,7 +225,7 @@ void setup(){
     display.setFont(ArialMT_Plain_10);
     display.setColor(WHITE);
     display.drawString(0, 0, "Mounting SPIFFS...     ");
-    display.display();        
+    display.display();
     if(!SPIFFS.begin()){
         Serial.println("SPIFFS mount failed");
         display.drawStringMaxWidth(0, 10, 128, "SPIFFS mount failed. Upload video.hs using ESP32 Sketch Upload."); display.display();
@@ -253,3 +253,4 @@ void setup(){
 void loop(){
 
 }
+
