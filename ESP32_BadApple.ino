@@ -108,16 +108,48 @@ void putPixels(uint32_t c, int32_t len) {
     // Direct Draw OLED buffer
     // OLED Buffer Image Rotate 90 Convert X-Y and Byte structure
     if (b == 0x01) {
-      *(pImage++) = (c & 0x80) ? b : 0;
-      *(pImage++) = (c & 0x40) ? b : 0;
-      *(pImage++) = (c & 0x20) ? b : 0;
-      *(pImage++) = (c & 0x10) ? b : 0;
+      if (c == 0xff) {
+        *(pImage++) = b;
+        *(pImage++) = b;
+        *(pImage++) = b;
+        *(pImage++) = b;
 
-      *(pImage++) = (c & 0x08) ? b : 0;
-      *(pImage++) = (c & 0x04) ? b : 0;
-      *(pImage++) = (c & 0x02) ? b : 0;
-      *(pImage++) = (c & 0x01) ? b : 0;
-    } else {
+        *(pImage++) = b;
+        *(pImage++) = b;
+        *(pImage++) = b;
+        *(pImage++) = b;
+      } else if (c != 0x00) {
+        *(pImage++) = (c & 0x80) ? b : 0;
+        *(pImage++) = (c & 0x40) ? b : 0;
+        *(pImage++) = (c & 0x20) ? b : 0;
+        *(pImage++) = (c & 0x10) ? b : 0;
+
+        *(pImage++) = (c & 0x08) ? b : 0;
+        *(pImage++) = (c & 0x04) ? b : 0;
+        *(pImage++) = (c & 0x02) ? b : 0;
+        *(pImage++) = (c & 0x01) ? b : 0;
+      } else {
+        *(pImage++) = 0;
+        *(pImage++) = 0;
+        *(pImage++) = 0;
+        *(pImage++) = 0;
+
+        *(pImage++) = 0;
+        *(pImage++) = 0;
+        *(pImage++) = 0;
+        *(pImage++) = 0;
+      }
+    } else if (c == 0xff) {
+      *(pImage++) |= b;
+      *(pImage++) |= b;
+      *(pImage++) |= b;
+      *(pImage++) |= b;
+
+      *(pImage++) |= b;
+      *(pImage++) |= b;
+      *(pImage++) |= b;
+      *(pImage++) |= b;
+    } else if (c != 0x00) {
       *(pImage++) |= (c & 0x80) ? b : 0;
       *(pImage++) |= (c & 0x40) ? b : 0;
       *(pImage++) |= (c & 0x20) ? b : 0;
@@ -127,6 +159,8 @@ void putPixels(uint32_t c, int32_t len) {
       *(pImage++) |= (c & 0x04) ? b : 0;
       *(pImage++) |= (c & 0x02) ? b : 0;
       *(pImage++) |= (c & 0x01) ? b : 0;
+    } else {
+      pImage += 8;
     }
 
     curr_x++;
