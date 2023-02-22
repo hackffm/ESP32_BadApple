@@ -4,6 +4,9 @@
 #include "SSD1306.h"
 #include "heatshrink_decoder.h"
 
+// Board Boot SW GPIO 0
+#define BOOT_SW 0
+
 // Hints:
 // * Adjust the display pins below
 // * After uploading to ESP32, also do "ESP32 Sketch Data Upload" from Arduino
@@ -90,7 +93,7 @@ void putPixels(uint8_t c, int32_t len) {
           display.display();
           //display.clear();
           // 30 fps target rate
-          if(digitalRead(0)) while((millis() - lastRefresh) < 33) ;
+          if(digitalRead(BOOT_SW)) while((millis() - lastRefresh) < 33) ;
           lastRefresh = millis();
         }
       }
@@ -248,7 +251,7 @@ void setup(){
         return;
     }
 
-    pinMode(0, INPUT_PULLUP);
+    pinMode(BOOT_SW, INPUT_PULLUP);
     Serial.print("totalBytes(): ");
     Serial.println(SPIFFS.totalBytes());
     Serial.print("usedBytes(): ");
