@@ -167,7 +167,7 @@ void decodeRLE(uint8_t c) {
 #define READBUFSIZE 2048
 void readFile(fs::FS &fs, const char * path){
     static uint8_t rle_buf[RLEBUFSIZE];
-    size_t rle_bufhead = 0;
+    uint8_t* p_rle_buf;
     size_t rle_size = 0;
 
     size_t filelen = 0;
@@ -234,7 +234,7 @@ void readFile(fs::FS &fs, const char * path){
           }
 #endif
 
-          rle_bufhead = 0;
+          p_rle_buf = rle_buf;
           while(rle_size) {
             rle_size--;
 #ifndef DISABLE_HS_ERROR
@@ -243,7 +243,7 @@ void readFile(fs::FS &fs, const char * path){
               return;
             }
 #endif
-            decodeRLE(rle_buf[rle_bufhead++]);
+            decodeRLE(*(p_rle_buf++));
           }
       } while (pres == HSDR_POLL_MORE);
     }
