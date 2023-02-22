@@ -186,8 +186,7 @@ void readFile(fs::FS &fs, const char * path){
     Serial.printf("File size: %d\n", filelen);
 
     // init display, putPixels and decodeRLE
-    display.clear();
-    display.display();
+    display.resetDisplay();
     curr_x = 0;
     curr_y = 0;
     runlength = -1;
