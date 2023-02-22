@@ -196,7 +196,6 @@ void readFile(fs::FS &fs, const char * path){
     heatshrink_decoder_reset(&hsd);
     size_t   count  = 0;
     uint32_t sunk   = 0;
-    size_t toRead;
     size_t toSink = 0;
     uint32_t sinkHead = 0;
 
@@ -205,11 +204,8 @@ void readFile(fs::FS &fs, const char * path){
     // Go through file...
     while(filelen) {
       if(toSink == 0) {
-        toRead = filelen;
-        if(toRead > READBUFSIZE) toRead = READBUFSIZE;
-        file.read(compbuf, toRead);
-        filelen -= toRead;
-        toSink = toRead;
+        toSink = file.read(compbuf, READBUFSIZE);
+        filelen -= toSink;
         sinkHead = 0;
       }
 
