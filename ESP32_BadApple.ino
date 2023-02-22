@@ -224,6 +224,11 @@ void readFile(fs::FS &fs, const char * path){
     }
     file.close();
     Serial.println("Done.");
+
+    // 10 sec
+    delay(10000);
+    // Reset to Infinite Loop Demo !
+    ESP.restart();
 }
 
 
