@@ -210,8 +210,7 @@ void readFile(fs::FS &fs, const char * path){
       }
 
       // uncompress buffer
-      HSD_sink_res sres;
-      sres = heatshrink_decoder_sink(&hsd, &compbuf[sinkHead], toSink, &count);
+      heatshrink_decoder_sink(&hsd, &compbuf[sinkHead], toSink, &count);
       //Serial.print("^^ sinked ");
       //Serial.println(count);
       toSink -= count;
