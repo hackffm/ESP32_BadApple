@@ -8,8 +8,17 @@
 // * Adjust the display pins below
 // * After uploading to ESP32, also do "ESP32 Sketch Data Upload" from Arduino
 
-SSD1306 display (0x3c, 4, 15); // For Heltec
-//SSD1306 display (0x3c, 5, 4);
+// SSD1306 display I2C bus
+// For Heltec
+// #define I2C_SCL 15
+// #define I2C_SDA 4
+// #define RESET_OLED 16
+
+// For Wemos Lolin32 ESP32
+#define I2C_SCL 4
+#define I2C_SDA 5
+
+SSD1306 display (0x3c, I2C_SDA, I2C_SCL);
 
 #if HEATSHRINK_DYNAMIC_ALLOC
 #error HEATSHRINK_DYNAMIC_ALLOC must be false for static allocation test suite.
@@ -216,8 +225,10 @@ void readFile(fs::FS &fs, const char * path){
 
 void setup(){
     Serial.begin(115200);
+#ifdef RESET_OLED
     // Reset for some displays
-    pinMode(16,OUTPUT); digitalWrite(16, LOW); delay(50); digitalWrite(16, HIGH);
+    pinMode(RESET_OLED, OUTPUT); digitalWrite(RESET_OLED, LOW); delay(50); digitalWrite(RESET_OLED, HIGH);
+#endif
     display.init();
     display.flipScreenVertically ();
     display.clear();
