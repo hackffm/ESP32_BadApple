@@ -18,6 +18,8 @@
 #define I2C_SCL 4
 #define I2C_SDA 5
 
+#define OLED_BRIGHTNESS 16
+
 SSD1306 display (0x3c, I2C_SDA, I2C_SCL);
 
 #if HEATSHRINK_DYNAMIC_ALLOC
@@ -230,6 +232,9 @@ void setup(){
     pinMode(RESET_OLED, OUTPUT); digitalWrite(RESET_OLED, LOW); delay(50); digitalWrite(RESET_OLED, HIGH);
 #endif
     display.init();
+#ifdef OLED_BRIGHTNESS
+    display.setBrightness(OLED_BRIGHTNESS);
+#endif
     display.flipScreenVertically ();
     display.clear();
     display.setTextAlignment (TEXT_ALIGN_LEFT);
