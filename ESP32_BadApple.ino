@@ -104,63 +104,47 @@ void ARDUINO_ISR_ATTR isr() {
 }
 
 void putPixels(uint32_t c, int32_t len) {
+  uint32_t d1;
+  uint32_t d2;
+
   while(len--) {
     // Direct Draw OLED buffer
     // OLED Buffer Image Rotate 90 Convert X-Y and Byte structure
-    if (b == 0x01) {
+    {
+      // 4 dot(Direct Access 4 byte, 32 bit)
+      d1 = 0;
+      d2 = 0;
       if (c == 0xff) {
-        *(pImage++) = b;
-        *(pImage++) = b;
-        *(pImage++) = b;
-        *(pImage++) = b;
+        d1  = b; d1 <<= 8;
+        d1 |= b; d1 <<= 8;
+        d1 |= b; d1 <<= 8;
+        d1 |= b;
 
-        *(pImage++) = b;
-        *(pImage++) = b;
-        *(pImage++) = b;
-        *(pImage++) = b;
+        d2 = d1;
       } else if (c != 0x00) {
-        *(pImage++) = (c & 0x80) ? b : 0;
-        *(pImage++) = (c & 0x40) ? b : 0;
-        *(pImage++) = (c & 0x20) ? b : 0;
-        *(pImage++) = (c & 0x10) ? b : 0;
+        d1  = (c & 0x10) ? b : 0; d1 <<= 8;
+        d1 |= (c & 0x20) ? b : 0; d1 <<= 8;
+        d1 |= (c & 0x40) ? b : 0; d1 <<= 8;
+        d1 |= (c & 0x80) ? b : 0;
 
-        *(pImage++) = (c & 0x08) ? b : 0;
-        *(pImage++) = (c & 0x04) ? b : 0;
-        *(pImage++) = (c & 0x02) ? b : 0;
-        *(pImage++) = (c & 0x01) ? b : 0;
-      } else {
-        *(pImage++) = 0;
-        *(pImage++) = 0;
-        *(pImage++) = 0;
-        *(pImage++) = 0;
-
-        *(pImage++) = 0;
-        *(pImage++) = 0;
-        *(pImage++) = 0;
-        *(pImage++) = 0;
+        d2  = (c & 0x01) ? b : 0; d2 <<= 8;
+        d2 |= (c & 0x02) ? b : 0; d2 <<= 8;
+        d2 |= (c & 0x04) ? b : 0; d2 <<= 8;
+        d2 |= (c & 0x08) ? b : 0;
       }
-    } else if (c == 0xff) {
-      *(pImage++) |= b;
-      *(pImage++) |= b;
-      *(pImage++) |= b;
-      *(pImage++) |= b;
 
-      *(pImage++) |= b;
-      *(pImage++) |= b;
-      *(pImage++) |= b;
-      *(pImage++) |= b;
-    } else if (c != 0x00) {
-      *(pImage++) |= (c & 0x80) ? b : 0;
-      *(pImage++) |= (c & 0x40) ? b : 0;
-      *(pImage++) |= (c & 0x20) ? b : 0;
-      *(pImage++) |= (c & 0x10) ? b : 0;
-
-      *(pImage++) |= (c & 0x08) ? b : 0;
-      *(pImage++) |= (c & 0x04) ? b : 0;
-      *(pImage++) |= (c & 0x02) ? b : 0;
-      *(pImage++) |= (c & 0x01) ? b : 0;
-    } else {
-      pImage += 8;
+      if (b == 0x01) {
+        *(uint32_t*)pImage = d1;
+        pImage += 4;
+        *(uint32_t*)pImage = d2;
+      } else if (c != 0x00) {
+        *(uint32_t*)pImage |= d1;
+        pImage += 4;
+        *(uint32_t*)pImage |= d2;
+      } else {
+        pImage += 4;
+      }
+      pImage += 4;
     }
 
     curr_x++;
