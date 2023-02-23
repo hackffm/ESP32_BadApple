@@ -93,7 +93,7 @@ volatile unsigned long lastRefresh = 0;
 #ifdef ENABLE_FRAME_COUNTER
 int32_t frame = 0;
 #endif
-uint8_t* pImage;
+uint32_t* pImage;
 uint32_t b = 0x01;
 
 volatile bool isButtonPressing = false;
@@ -134,34 +134,32 @@ void putPixels(uint32_t c, int32_t len) {
       }
 
       if (b == 0x01) {
-        *(uint32_t*)pImage = d1;
-        pImage += 4;
-        *(uint32_t*)pImage = d2;
+        *pImage++ = d1;
+        *pImage   = d2;
       } else if (c != 0x00) {
-        *(uint32_t*)pImage |= d1;
-        pImage += 4;
-        *(uint32_t*)pImage |= d2;
+        *pImage++ |= d1;
+        *pImage   |= d2;
       } else {
-        pImage += 4;
+        pImage++;
       }
-      pImage += 4;
+      pImage++;
     }
 
     curr_x++;
     if(curr_x == 128/8) {
       curr_x = 0;
-      pImage -= 128;
+      pImage -= 128/4;
 
       b <<= 1;
       if(b == 0x100) {
         // Next Page
-        pImage += 128;
+        pImage += 128/4;
         b = 0x01;
 
         curr_y++;
         if(curr_y == 8) {
           curr_y = 0;
-          pImage = display.buffer;
+          pImage = (uint32_t*)display.buffer;
 
           // Update Display frame
           display.display();
@@ -243,7 +241,7 @@ void readFile(fs::FS &fs, const char * path){
     display.resetDisplay();
     curr_x = 0;
     curr_y = 0;
-    pImage = display.buffer;
+    pImage = (uint32_t*)display.buffer;
     runlength = -1;
     c_to_dup = -1;
 
