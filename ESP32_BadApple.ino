@@ -10,6 +10,9 @@
 // Frame counter
 #define ENABLE_FRAME_COUNTER
 
+// Disable heatshrink error checking
+#define DISABLE_HS_ERROR
+
 // Hints:
 // * Adjust the display pins below
 // * After uploading to ESP32, also do "ESP32 Sketch Data Upload" from Arduino
@@ -229,19 +232,23 @@ void readFile(fs::FS &fs, const char * path){
           pres = heatshrink_decoder_poll(&hsd, rle_buf, RLEBUFSIZE, &rle_size);
           //Serial.print("^^ polled ");
           //Serial.println(rle_size);
+#ifndef DISABLE_HS_ERROR
           if(pres < 0) {
             Serial.print("POLL ERR! ");
             Serial.println(pres);
             return;
           }
+#endif
 
           rle_bufhead = 0;
           while(rle_size) {
             rle_size--;
+#ifndef DISABLE_HS_ERROR
             if(rle_bufhead >= RLEBUFSIZE) {
               Serial.println("RLE_SIZE ERR!");
               return;
             }
+#endif
             decodeRLE(rle_buf[rle_bufhead++]);
           }
       } while (pres == HSDR_POLL_MORE);
