@@ -49,8 +49,7 @@ SSD1306 display (0x3c, I2C_SDA, I2C_SCL);
 static heatshrink_decoder hsd;
 
 // global storage for putPixels
-int32_t curr_x = 0;
-int32_t curr_y = 0;
+int32_t curr_xy = 0;
 
 // global storage for decodeRLE
 int32_t runlength = -1;
@@ -149,9 +148,9 @@ void putPixels(uint32_t c, int32_t len) {
       pImage++;
     }
 
-    curr_x++;
-    if(curr_x == 128/8) {
-      curr_x = 0;
+    // oyy_ybbb_xxxx X=0-15(4 bit), Bit=0-7(3 bit),Y=0-7(3 bit)
+    curr_xy++;
+    if((curr_xy & 0x0f) == 0) {
       pImage -= 128/4;
 
       b <<= 1;
@@ -160,9 +159,10 @@ void putPixels(uint32_t c, int32_t len) {
         pImage += 128/4;
         b = 0x01;
 
-        curr_y++;
-        if(curr_y == 8) {
-          curr_y = 0;
+        // oyy_ybbb_xxxx X=0-15(4 bit), Bit=0-7(3 bit),Y=0-7(3 bit)
+        // Check Overflow bit
+        if((curr_xy & 0x400) != 0) {
+          curr_xy = 0;
           pImage = (uint32_t*)display.buffer;
 
           // Update Display frame
@@ -243,8 +243,7 @@ void readFile(fs::FS &fs, const char * path){
 
     // init display, putPixels and decodeRLE
     display.resetDisplay();
-    curr_x = 0;
-    curr_y = 0;
+    curr_xy = 0;
     pImage = (uint32_t*)display.buffer;
     runlength = -1;
     c_to_dup = -1;
