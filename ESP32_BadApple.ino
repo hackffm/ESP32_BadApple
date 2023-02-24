@@ -90,8 +90,8 @@ void ARDUINO_ISR_ATTR isr() {
     isButtonPressing = (digitalRead(BOOT_SW) == LOW);
 }
 
-void putPixels(uint8_t c, int32_t len) {
-  uint8_t b = 0;
+void putPixels(uint32_t c, int32_t len) {
+  uint32_t b = 0;
   while(len--) {
     b = 128;
     for(int i=0; i<8; i++) {
@@ -128,7 +128,7 @@ void putPixels(uint8_t c, int32_t len) {
   }
 }
 
-void decodeRLE(uint8_t c) {
+void decodeRLE(uint32_t c) {
     if(c_to_dup == -1) {
       if((c == 0x55) || (c == 0xaa)) {
         c_to_dup = c;
