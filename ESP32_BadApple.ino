@@ -312,6 +312,10 @@ void readFile(fs::FS &fs, const char * path){
 
     // 10 sec
     delay(10000);
+    display.resetDisplay();
+    display.drawStringMaxWidth(0, 0, 128, "Optimize OLED Draw Performance version. modded By FREE WING");
+    display.drawStringMaxWidth(0, 40, 128, "http://www.neko.ne.jp/~freewing/"); display.display();
+    delay(10000);
     // Reset to Infinite Loop Demo !
     ESP.restart();
 }
