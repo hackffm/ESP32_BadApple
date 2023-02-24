@@ -7,6 +7,9 @@
 // Board Boot SW GPIO 0
 #define BOOT_SW 0
 
+// Frame counter
+#define ENABLE_FRAME_COUNTER
+
 // Hints:
 // * Adjust the display pins below
 // * After uploading to ESP32, also do "ESP32 Sketch Data Upload" from Arduino
@@ -73,6 +76,9 @@ void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
 volatile unsigned long lastRefresh = 0;
 // 30 fps target rate = 33.333us
 #define FRAME_DERAY_US 33333UL
+#ifdef ENABLE_FRAME_COUNTER
+int32_t frame = 0;
+#endif
 
 volatile bool isButtonPressing = false;
 
@@ -107,6 +113,10 @@ void putPixels(uint8_t c, int32_t len) {
           if(!isButtonPressing) {
             // 30 fps target rate = 33.333us
             lastRefresh += FRAME_DERAY_US;
+#ifdef ENABLE_FRAME_COUNTER
+            // Adjust 33.334us every 3 frame
+            if ((++frame % 3) == 0) lastRefresh++;
+#endif
             while(micros() < lastRefresh) ;
           }
         }
@@ -237,7 +247,12 @@ void readFile(fs::FS &fs, const char * path){
       } while (pres == HSDR_POLL_MORE);
     }
     file.close();
+#ifdef ENABLE_FRAME_COUNTER
+    Serial.print("Done. ");
+    Serial.println(frame);
+#else
     Serial.println("Done.");
+#endif
 
     // 10 sec
     delay(10000);
