@@ -160,9 +160,8 @@ void putPixels(uint32_t c, int32_t len) {
         b = 0x01;
 
         // oyy_ybbb_xxxx X=0-15(4 bit), Bit=0-7(3 bit),Y=0-7(3 bit)
-        // Check Overflow bit
-        if((curr_xy & 0x400) != 0) {
-          curr_xy = 0;
+        // Check Overflow bit, It equivalent if((curr_xy & 0x400) != 0)
+        if((curr_xy & 0x3ff) == 0) {
           pImage = (uint32_t*)display.buffer;
 
           // Update Display frame
