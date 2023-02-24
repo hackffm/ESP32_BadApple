@@ -38,8 +38,8 @@ SSD1306 display (0x3c, I2C_SDA, I2C_SCL);
 static heatshrink_decoder hsd;
 
 // global storage for putPixels
-int16_t curr_x = 0;
-int16_t curr_y = 0;
+int32_t curr_x = 0;
+int32_t curr_y = 0;
 
 // global storage for decodeRLE
 int32_t runlength = -1;
