@@ -70,7 +70,9 @@ void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
     }
 }
 
-uint32_t lastRefresh = 0;
+unsigned long lastRefresh = 0;
+// 30 fps target rate = 33.333us
+#define FRAME_DERAY_US 33333UL
 
 void putPixels(uint8_t c, int32_t len) {
   uint8_t b = 0;
@@ -90,11 +92,14 @@ void putPixels(uint8_t c, int32_t len) {
         curr_y++;
         if(curr_y >= 64) {
           curr_y = 0;
+
+          // Update Display frame
           display.display();
           //display.clear();
-          // 30 fps target rate
-          if(digitalRead(BOOT_SW)) while((millis() - lastRefresh) < 33) ;
-          lastRefresh = millis();
+
+          // 30 fps target rate = 33.333us
+          lastRefresh += FRAME_DERAY_US;
+          if(digitalRead(BOOT_SW)) while(micros() < lastRefresh) ;
         }
       }
     }
@@ -165,7 +170,6 @@ void readFile(fs::FS &fs, const char * path){
     curr_y = 0;
     runlength = -1;
     c_to_dup = -1;
-    lastRefresh = millis();
 
     // init decoder
     heatshrink_decoder_reset(&hsd);
@@ -175,6 +179,7 @@ void readFile(fs::FS &fs, const char * path){
     size_t toSink = 0;
     uint32_t sinkHead = 0;
 
+    lastRefresh = micros();
 
     // Go through file...
     while(filelen) {
