@@ -70,9 +70,16 @@ void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
     }
 }
 
-unsigned long lastRefresh = 0;
+volatile unsigned long lastRefresh = 0;
 // 30 fps target rate = 33.333us
 #define FRAME_DERAY_US 33333UL
+
+volatile bool isButtonPressing = false;
+
+void ARDUINO_ISR_ATTR isr() {
+    lastRefresh = micros();
+    isButtonPressing = (digitalRead(BOOT_SW) == LOW);
+}
 
 void putPixels(uint8_t c, int32_t len) {
   uint8_t b = 0;
@@ -97,9 +104,11 @@ void putPixels(uint8_t c, int32_t len) {
           display.display();
           //display.clear();
 
-          // 30 fps target rate = 33.333us
-          lastRefresh += FRAME_DERAY_US;
-          if(digitalRead(BOOT_SW)) while(micros() < lastRefresh) ;
+          if(!isButtonPressing) {
+            // 30 fps target rate = 33.333us
+            lastRefresh += FRAME_DERAY_US;
+            while(micros() < lastRefresh) ;
+          }
         }
       }
     }
@@ -262,6 +271,7 @@ void setup(){
     }
 
     pinMode(BOOT_SW, INPUT_PULLUP);
+    attachInterrupt(BOOT_SW, isr, CHANGE);
     Serial.print("totalBytes(): ");
     Serial.println(SPIFFS.totalBytes());
     Serial.print("usedBytes(): ");
