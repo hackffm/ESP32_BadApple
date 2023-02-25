@@ -86,7 +86,7 @@ void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
     }
 }
 
-volatile unsigned long lastRefresh = 0;
+volatile unsigned long lastRefresh;
 // 30 fps target rate = 33.333us
 #define FRAME_DERAY_US 33333UL
 #ifdef ENABLE_FRAME_COUNTER
@@ -223,9 +223,9 @@ void decodeRLE(uint32_t c) {
 void readFile(fs::FS &fs, const char * path){
     static uint8_t rle_buf[RLEBUFSIZE];
     uint8_t* p_rle_buf;
-    size_t rle_size = 0;
+    size_t rle_size;
 
-    size_t filelen = 0;
+    size_t filelen;
     size_t filesize;
     static uint8_t compbuf[READBUFSIZE];
 
@@ -242,10 +242,10 @@ void readFile(fs::FS &fs, const char * path){
 
     // init display, putPixels and decodeRLE
     display.resetDisplay();
-    curr_xy = 0;
+    // curr_xy = 0;
     pImage = (uint32_t*)display.buffer;
-    runlength = -1;
-    c_to_dup = -1;
+    // runlength = -1;
+    // c_to_dup = -1;
 
     // init decoder
     heatshrink_decoder_reset(&hsd);
@@ -277,7 +277,7 @@ void readFile(fs::FS &fs, const char * path){
 
       HSD_poll_res pres;
       do {
-          rle_size = 0;
+          // rle_size = 0;
           pres = heatshrink_decoder_poll(&hsd, rle_buf, RLEBUFSIZE, &rle_size);
           //Serial.print("^^ polled ");
           //Serial.println(rle_size);
