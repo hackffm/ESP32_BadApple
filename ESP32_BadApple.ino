@@ -122,19 +122,19 @@ void putPixels(uint32_t c, int32_t len) {
 
         d2 = d1;
       } else if (c != 0x00) {
-        if ((c & 0xF0) != 0x00) {
+        // if ((c & 0xF0) != 0x00) {
           if (c & 0x10) d1  = b<<24;
           if (c & 0x20) d1 |= b<<16;
           if (c & 0x40) d1 |= b<< 8;
           if (c & 0x80) d1 |= b;
-        }
+        // }
 
-        if ((c & 0x0F) != 0x00) {
+        // if ((c & 0x0F) != 0x00) {
           if (c & 0x01) d2  = b<<24;
           if (c & 0x02) d2 |= b<<16;
           if (c & 0x04) d2 |= b<< 8;
           if (c & 0x08) d2 |= b;
-        }
+        // }
       }
 
       if (b == 0x01) {
