@@ -93,6 +93,8 @@ volatile unsigned long lastRefresh = 0;
 #ifdef ENABLE_FRAME_COUNTER
 int32_t frame = 0;
 #endif
+uint8_t* pImage;
+uint32_t b = 0x01;
 
 volatile bool isButtonPressing = false;
 
@@ -102,23 +104,46 @@ void ARDUINO_ISR_ATTR isr() {
 }
 
 void putPixels(uint32_t c, int32_t len) {
-  uint32_t b = 0;
   while(len--) {
-    b = 128;
-    for(int i=0; i<8; i++) {
-      if(c & b) {
-        display.setColor(WHITE);
-      } else {
-        display.setColor(BLACK);
-      }
-      b >>= 1;
-      display.setPixel(curr_x, curr_y);
-      curr_x++;
-      if(curr_x >= 128) {
-        curr_x = 0;
+    // Direct Draw OLED buffer
+    // OLED Buffer Image Rotate 90 Convert X-Y and Byte structure
+    if (b == 0x01) {
+      *(pImage++) = (c & 0x80) ? b : 0;
+      *(pImage++) = (c & 0x40) ? b : 0;
+      *(pImage++) = (c & 0x20) ? b : 0;
+      *(pImage++) = (c & 0x10) ? b : 0;
+
+      *(pImage++) = (c & 0x08) ? b : 0;
+      *(pImage++) = (c & 0x04) ? b : 0;
+      *(pImage++) = (c & 0x02) ? b : 0;
+      *(pImage++) = (c & 0x01) ? b : 0;
+    } else {
+      *(pImage++) |= (c & 0x80) ? b : 0;
+      *(pImage++) |= (c & 0x40) ? b : 0;
+      *(pImage++) |= (c & 0x20) ? b : 0;
+      *(pImage++) |= (c & 0x10) ? b : 0;
+
+      *(pImage++) |= (c & 0x08) ? b : 0;
+      *(pImage++) |= (c & 0x04) ? b : 0;
+      *(pImage++) |= (c & 0x02) ? b : 0;
+      *(pImage++) |= (c & 0x01) ? b : 0;
+    }
+
+    curr_x++;
+    if(curr_x == 128/8) {
+      curr_x = 0;
+      pImage -= 128;
+
+      b <<= 1;
+      if(b == 0x100) {
+        // Next Page
+        pImage += 128;
+        b = 0x01;
+
         curr_y++;
-        if(curr_y >= 64) {
+        if(curr_y == 8) {
           curr_y = 0;
+          pImage = display.buffer;
 
           // Update Display frame
           display.display();
@@ -200,6 +225,7 @@ void readFile(fs::FS &fs, const char * path){
     display.resetDisplay();
     curr_x = 0;
     curr_y = 0;
+    pImage = display.buffer;
     runlength = -1;
     c_to_dup = -1;
 
