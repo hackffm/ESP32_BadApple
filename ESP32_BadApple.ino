@@ -29,7 +29,15 @@
 
 #define OLED_BRIGHTNESS 16
 
+// MAX freq for SCL is 4 MHz, However, Actual measured value is 892 kHz . (ESP32-D0WDQ6 (revision 1))
+// see Inter-Integrated Circuit (I2C)
+// https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/i2c.html
+#define I2C_SCLK_FREQ 4000000
+#ifdef I2C_SCLK_FREQ
+SSD1306 display (0x3c, I2C_SDA, I2C_SCL, GEOMETRY_128_64, I2C_ONE, I2C_SCLK_FREQ);
+#else
 SSD1306 display (0x3c, I2C_SDA, I2C_SCL);
+#endif
 
 #if HEATSHRINK_DYNAMIC_ALLOC
 #error HEATSHRINK_DYNAMIC_ALLOC must be false for static allocation test suite.
