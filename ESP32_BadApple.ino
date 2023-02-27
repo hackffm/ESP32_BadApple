@@ -39,6 +39,9 @@ SSD1306 display (0x3c, I2C_SDA, I2C_SCL, GEOMETRY_128_64, I2C_ONE, I2C_SCLK_FREQ
 SSD1306 display (0x3c, I2C_SDA, I2C_SCL);
 #endif
 
+// Enable I2C Clock up 892kHz to 1.31MHz (It Actual measured value with ESP32-D0WDQ6 (revision 1))
+// #define ENABLE_EXTRA_I2C_CLOCK_UP
+
 #if HEATSHRINK_DYNAMIC_ALLOC
 #error HEATSHRINK_DYNAMIC_ALLOC must be false for static allocation test suite.
 #endif
@@ -301,6 +304,21 @@ void setup(){
     Serial.print("usedBytes(): ");
     Serial.println(SPIFFS.usedBytes());
     listDir(SPIFFS, "/", 0);
+
+#ifdef ENABLE_EXTRA_I2C_CLOCK_UP
+    // Direct Access I2C SCL frequency setting value
+    // It Tested ESP32-D0WDQ6 (revision 1)
+    uint32_t* ptr;
+    ptr = (uint32_t*)0x3FF53000; // I2C_SCL_LOW_PERIOD_REG
+    // *ptr = 30; // Don't work
+    // *ptr = 31; // Sometime Stop Frame drawing
+    // *ptr = 32; // Works
+    *ptr = 35; // Safety value
+    ptr = (uint32_t*)0x3FF53038; // I2C_SCL_HIGH_PERIOD_REG
+    // *ptr = 0; // Works
+    *ptr = 2; // Safety value
+#endif
+
     readFile(SPIFFS, "/video.hs");
 
     //Serial.print("Format SPIFSS? (enter y for yes): ");
